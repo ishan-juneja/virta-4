@@ -1,0 +1,25 @@
+.login-container {
+    min-height: 100vh; /* Full viewport height */
+    display: flex;
+    align-items: center; /* Aligns vertically */
+    justify-content: center; /* Aligns horizontally */
+    background-color: #007bff; /* Sets the background color for the full container */
+  }
+  
+  .card {
+    width: 100%; /* Adjust width as necessary, could be less like 90% or fixed like 500px */
+    max-width: 500px; /* Maximum width of the card */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background: #fff; /* Ensure card is a different color for visibility */
+  }
+  
+  .btn-primary {
+    background-color: #007bff; /* Darker shade for contrast if needed */
+  }
+  
+  .form-control {
+    border-radius: 5px; /* Rounded input fields */
+  }
+  

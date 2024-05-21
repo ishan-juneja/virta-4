@@ -36,3 +36,40 @@
     transform: rotate(360deg);
   }
 }
+
+.legend-indicator {
+  width: 20px; /* Set square size */
+  height: 20px; /* Set square size */
+  display: inline-block;
+  margin-right: 5px;
+}
+
+
+.btn-primary {
+  border-color: #007bff; /* Adjust this to match your theme blue color */
+  background-color: #007bff;
+}
+
+.table thead th {
+  background-color: #f8f9fa; /* Light grey background for header */
+  border-bottom: 2px solid #dee2e6; /* Grey bottom border for a subtle separation */
+}
+
+/* More styles can be added here to match the exact theme colors and padding/margins you desire */
+/* Ensure that the sidebar spans the full height and starts from the very top */
+.sidebar {
+  height: 100vh;
+  margin-top: 0;
+}
+
+/* Main content area needs to be adjusted so it does not overlap or appear below the sidebar */
+.main-content {
+  margin-left: 250px;  /* Adjust based on the width of your sidebar */
+  padding-top: 60px;  /* Adjust based on the height of your navbar */
+}
+
+/* Style for the diagnose button when clicked */
+.diagnose-button.clicked {
+  background-color: #007bff;  /* Adjust the color to match your theme */
+  color: white;
+}
