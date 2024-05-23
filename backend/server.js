@@ -8,6 +8,7 @@ const port = 3001;
 
 app.use(bodyParser.json());
 app.use(cors()); // Enable CORS for all routes
+app.use(bodyParser.urlencoded({ extended: true })); // Add this line to handle URL-encoded form data
 
 // MySQL connection setup
 const connection = mysql.createConnection({
@@ -24,6 +25,24 @@ connection.connect(err => {
   }
   console.log('Connected to the database');
 });
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'client/build')));
+
+app.post('/submit', (req, res) => {
+  const { field1, field2, field3, field4, field5, field6, field7, field8 } = req.body;
+  const sql = 'INSERT INTO responses (field1, field2, field3, field4, field5, field6, field7, field8) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+  
+  connection.query(sql, [field1, field2, field3, field4, field5, field6, field7, field8], (err, result) => {
+    if (err) {
+      console.error('Error inserting data:', err);
+      return res.status(500).send('Error submitting form');
+    }
+    console.log('Data inserted:', result);
+    res.send('Form submitted successfully');
+  });
+});
+
 
 // Endpoint to fetch a row by ID
 app.get('/api/data/:id', (req, res) => {
@@ -143,14 +162,46 @@ app.get('/api/notlikelycount', (req, res) => {
 // DELETE endpoint to clear all data from the database except specific IDs
 app.delete('/api/data', (req, res) => {
   console.log('Received DELETE request to /api/data');
-  connection.query("DELETE FROM responses WHERE id NOT IN (?, ?, ?, ?, ?)", [1, 2, 3, 4, 5], (err, results) => {
+
+  // Begin transaction
+  connection.beginTransaction((err) => {
     if (err) {
-      console.error('Error executing delete query:', err);
-      res.status(500).send({ error: 'Internal Server Error' });
-    } else {
-      res.send('All entries except IDs 1, 2, 3, 4, and 5 deleted.');
-      console.log('Entries deleted except IDs 1, 2, 3, 4, and 5');
+      console.error('Error starting transaction:', err);
+      return res.status(500).send({ error: 'Internal Server Error' });
     }
+
+    // Delete all entries except IDs 1, 2, 3, 4, and 5
+    connection.query("DELETE FROM responses WHERE id NOT IN (?, ?, ?, ?, ?)", [1, 2, 3, 4, 5], (err, results) => {
+      if (err) {
+        return connection.rollback(() => {
+          console.error('Error executing delete query:', err);
+          res.status(500).send({ error: 'Internal Server Error' });
+        });
+      }
+
+      // Reset the auto-increment value
+      connection.query("ALTER TABLE responses AUTO_INCREMENT = 6", (err, result) => { // Change to desired start value
+        if (err) {
+          return connection.rollback(() => {
+            console.error('Error resetting auto-increment:', err);
+            res.status(500).send({ error: 'Internal Server Error' });
+          });
+        }
+
+        // Commit transaction
+        connection.commit((err) => {
+          if (err) {
+            return connection.rollback(() => {
+              console.error('Error committing transaction:', err);
+              res.status(500).send({ error: 'Internal Server Error' });
+            });
+          }
+
+          res.send('All entries except IDs 1, 2, 3, 4, and 5 deleted. Auto-increment reset.');
+          console.log('Entries deleted except IDs 1, 2, 3, 4, and 5, auto-increment reset');
+        });
+      });
+    });
   });
 });
 

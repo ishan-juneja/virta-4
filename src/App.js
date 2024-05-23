@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import DataPage from './components/DataPage';
 import LoginPage from './components/LoginPage';
+import FormPage from './components/FormPage';
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
         <Route path="/home" element={<HomePage />} />
         <Route path="/data" element={<DataPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/form" element={<FormPage />} />
         <Route path="/" element={<LoginPage />} /> {/* Default route to login */}
       </Routes>
     </Router>
