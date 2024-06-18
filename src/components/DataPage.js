@@ -25,7 +25,7 @@ const DataPage = () => {
             console.error('Error fetching count:', error);
         }
     };
-
+    
     // const toggleCheckbox = (index) => {
     //     const newData = [...data];
     //     const actualIndex = index + (currentPage - 1) * entriesPerPage;
@@ -56,24 +56,23 @@ const DataPage = () => {
     const handleButtonClick = async (index) => {
         const actualIndex = index + (currentPage - 1) * entriesPerPage;
         const rowData = data[actualIndex];
-        
+    
         try {
             // Step 1: Fetch the row data by ID
             const rowResponse = await axios.get(`http://localhost:3001/api/data/${rowData.id}`);
             const rowDataJson = rowResponse.data;
-            
-            // Step 2: Send the JSON to the processing endpoint
-            const processResponse = await axios.post('http://localhost:3001/api/process', rowDataJson);
+    
+            // Step 2: Send the JSON to the Node.js server for further processing
+            const processResponse = await axios.post('http://localhost:3001/api/diagnose', rowDataJson);
+    
+            // Step 3: Get the result from the server response
             const processResult = processResponse.data.result;
-
-            // Step 3: Update the MySQL database with the result in field9
-            await axios.put(`http://localhost:3001/api/update-field9/${rowData.id}`, { field9: processResult });
-
+    
             // Step 4: Update the local state to reflect the change
             const newData = [...data];
-            newData[actualIndex] = { ...newData[actualIndex], field9: processResult, clicked:true };
+            newData[actualIndex] = { ...newData[actualIndex], field9: processResult, clicked: true };
             setData(newData);
-
+    
         } catch (error) {
             console.error('Error processing data:', error);
         }

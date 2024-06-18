@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // Add this line to handle U
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Balderdash2004@',
+    password: 'virtabot!',
     database: 'my_form_data'
 });
 
@@ -204,6 +204,44 @@ app.delete('/api/data', (req, res) => {
     });
   });
 });
+
+const fs = require('fs');
+const { exec } = require('child_process');
+
+// endpoint to diagnose everything
+app.post('/api/diagnose', (req, res) => {
+    const { id, field1, field2, field3, field4, field5, field6, field7, field8 } = req.body;
+
+    // Write the parameters to a CSV file
+    const csvContent = `${id},${field1},${field2},${field3},${field4},${field5},${field6},${field7},${field8}\n`;
+    fs.writeFileSync('input.csv', csvContent);
+
+    // Call the Python script
+    exec('python3 diagnose.py input.csv', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing Python script: ${error}`);
+            return res.status(500).send('Error processing data');
+        }
+
+        const result = parseInt(stdout.trim());
+        
+        // Update the database with the result
+        connection.query('UPDATE responses SET field9 = ? WHERE id = ?', [result, id], (err, results) => {
+            if (err) {
+                console.error('Error updating field9:', err);
+                res.status(500).send(err);
+            } else {
+                res.json({ result });
+                console.log('Field 9 updated:', { id, result });
+            }
+        });
+    });
+});
+
+
+
+
+
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'build')));
